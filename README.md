@@ -781,7 +781,7 @@ ToNetwork - делает из графа сеть.
             private bool CheckHamiltonCycle(int[,] Hamiltonian, List<int> a, int n) {...}
         } // End of "Graph" class  
 
-**Биномиальное распределение**\
+**Биномиальное распределение**
 
 Вероятность успеха (параметр р) был взят в работе за 0.4 как наиболее
 оптимальный с точки зрения распределения плотности вершин в графе.
@@ -795,20 +795,26 @@ ToNetwork - делает из графа сеть.
         for (int i = 0; i < vertexNum; i++, x = 0) {  // для каждой вершины 
             p = Math.Pow(q, n), r = Convert.ToDouble(rand.Next(10000)) / 10000.0; 
             bool flag = true;
-            while (flag) {
+            while (flag) 
+            {
                 r = r - p;
-                if (r <= 0) {
+                if (r <= 0) 
+                {
                     if (x < n)  V[i] = x, flag = false;
-                    if (flag) {
+                    if (flag) 
+                    {
                         r = Convert.ToDouble(rand.Next(10000)) / 10000.0;
                         p = Math.Pow(q, n);
                     }
                 }
-                else { x = x + 1;
+                else 
+                {
+                    x = x + 1;
                     if (x == n) x--;
                     p = p * c * (n + 1 - x) / x;
                 }
-        }   } 
+            } 
+         
 
 Матрицы
 -------
@@ -816,10 +822,10 @@ ToNetwork - делает из графа сеть.
 Для работы с матрицами (двумерными массивами) был создан статический
 класс *Matrix*, содержащий в себе методы расширения типа *int[,]*. Все
 далее описываемые методы являются сатическими расширениями типа
-*int[,]*.\
+*int[,]*.
 
 Для нахождения определителя матрицы – метод Det. Его параметры: *int* n
-- размерность матрицы. Возвращает значение типа *int* - определитель.\
+- размерность матрицы. Возвращает значение типа *int* - определитель.
 
 Вспомогательный для Det метод GetMinor вычисляет минор ij элемента
 матрицы. Его параметры: *int* n - высота матрицы, *int* m - ширина
@@ -834,19 +840,19 @@ ToNetwork - делает из графа сеть.
 Dst - матрица, куда копировать, *int* n - высота матрицы, *int* m -
 ширина матрицы.
 
-Метод Substract вычитает матрицу В из А.\
+Метод Substract вычитает матрицу В из А.
 
 **Структура статического класса *Matrix***
 
         static class Matrix
         {
-        public static int Det(this int [,] M, int n){...}   
-        public static int[,] GetMinor(this int[,] M, int n, int m, int i, int j) {...}  
-        public static List<string> GetMatrixStrings(this int[,] M, int n, int m) {...}  
-        public static List<string> GetMatrixStrings(this int?[,] M, int n, int m) {...}
-        public static void CopyMatrixTo(this int[,] Src, int[,] Dst, int n, int m) {...}
-        public static void CopyMatrixTo(this int?[,] Src, int?[,] Dst, int n, int m) {...}
-        public static int[,] Substract(this int[,] A, int[,] B, int n, int m) {...}
+            public static int Det(this int [,] M, int n){...}   
+            public static int[,] GetMinor(this int[,] M, int n, int m, int i, int j) {...}  
+            public static List<string> GetMatrixStrings(this int[,] M, int n, int m) {...}  
+            public static List<string> GetMatrixStrings(this int?[,] M, int n, int m) {...}
+            public static void CopyMatrixTo(this int[,] Src, int[,] Dst, int n, int m) {...}
+            public static void CopyMatrixTo(this int?[,] Src, int?[,] Dst, int n, int m) {...}
+            public static int[,] Substract(this int[,] A, int[,] B, int n, int m) {...}
         }
         
 
@@ -870,12 +876,12 @@ isMin и *int* edgesInPath.
 В цикле происходит возведение в степень матрицы смежности по методу,
 описанному в разделе [sec:sec:sec:ShimbelMath]. Количество итераций
 соответсвует значению переменной edgesInPath. В случае если isMin
-является true, тогда при “сложении” выбирается min, иначе max.\
+является true, тогда при “сложении” выбирается min, иначе max.
 
 Пользовательский интерфейс состоит из заголовка **Метод Шимбелла** для
 набора следующего элементов: чекбокс для определения поиска минимальных
 или максимальных путей, поле ввода длин пути, кнопка **Шимбелл**,
-выводящая результат.\
+выводящая результат.
 
 **Реализация метода Shimbell**
 
@@ -883,22 +889,30 @@ isMin и *int* edgesInPath.
         {
           if (HasNegativeWeight)
             throw new Exception("Не реализуется на графе с \"-\" весами");  
+            
           if (edgesInPath <= 0)
             throw new Exception("Количество ребер должно быть больше 0");
+            
           if (edgesInPath > EdgesNum)
             throw new Exception("кол-во ребер пути должно быть <= кол-ва ребер графа");
+            
           if (edgesInPath == 1)
-            return AdjMatrix;   
+            return AdjMatrix;  
+            
           int _p = VertexNum;   
           int[,] tmpMatrix = new int[_p, _p], R = new int[_p, _p];
           int[] Wij = new int[_p];  
           AdjMatrix.CopyMatrixTo(tmpMatrix, _p, _p);
-          for (int n = 2; n <= edgesInPath; n++) {
-            for (int i = 0; i < _p; i++) {
-              for (int j = 0; j < _p; j++) {
+          for (int n = 2; n <= edgesInPath; n++) 
+          {
+            for (int i = 0; i < _p; i++) 
+            {
+              for (int j = 0; j < _p; j++) 
+              {
                 for (int k = 0; k < _p; k++)
                   Wij[k] = ShimbellMul(tmpMatrix[i, k], AdjMatrix[k, j]);
-                if (isMin) {
+                if (isMin) 
+                {
                   int k;
                   for (k = 0; (k < _p) && (Wij[k] <= 0); k++) ;
                     if (k < _p) R[i, j] = Wij[k];
@@ -925,7 +939,7 @@ isMin и *int* edgesInPath.
 Метод PathGaImasuKa принимает в качестве параметров номера 2 вершин типа
 *int*: v1, v2. Возвращает 0 в случае отсутствия между ними пути или
 количество ребер (степень, в которую была возведена матрица смежности в
-цикле по методу Шимбелла), если путь существует.\
+цикле по методу Шимбелла), если путь существует.
 
 Пользовательский интерфейс состоит из общего для метода Шимбелла и
 достижимости вершин заголовка для набора элементов **Метод Шимбелла**,
@@ -953,9 +967,11 @@ isMin и *int* edgesInPath.
         public int[] Dijkstra(int s)
         {
           if (HasNegativeWeight)
-            throw new Exception("Не реализуется на графе с \"-\" весами");  
+            throw new Exception("Не реализуется на графе с \"-\" весами"); 
+            
           if ((s < 0) || (s > VertexNum - 1))
             throw new Exception(String.Format("Номер вершины должен быть от 0 до {0}", VertexNum - 1));
+            
           int infinite = System.Int32.MaxValue;
           bool[] visited = new bool[VertexNum]; // постоянна ли метка
           int[] d = new int[VertexNum];
