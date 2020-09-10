@@ -881,58 +881,7 @@ isMin и *int* edgesInPath.
 Пользовательский интерфейс состоит из заголовка **Метод Шимбелла** для
 набора следующего элементов: чекбокс для определения поиска минимальных
 или максимальных путей, поле ввода длин пути, кнопка **Шимбелл**,
-выводящая результат.
-
-**Реализация метода Shimbell**
-
-        public int[,] Shimbell(bool isMin, int edgesInPath)
-        {
-          if (HasNegativeWeight)
-            throw new Exception("Не реализуется на графе с \"-\" весами");  
-            
-          if (edgesInPath <= 0)
-            throw new Exception("Количество ребер должно быть больше 0");
-            
-          if (edgesInPath > EdgesNum)
-            throw new Exception("кол-во ребер пути должно быть <= кол-ва ребер графа");
-            
-          if (edgesInPath == 1)
-            return AdjMatrix;  
-            
-          int _p = VertexNum;   
-          int[,] tmpMatrix = new int[_p, _p], R = new int[_p, _p];
-          int[] Wij = new int[_p];  
-          AdjMatrix.CopyMatrixTo(tmpMatrix, _p, _p);
-          for (int n = 2; n <= edgesInPath; n++) 
-          {
-            for (int i = 0; i < _p; i++) 
-            {
-              for (int j = 0; j < _p; j++) 
-              {
-                for (int k = 0; k < _p; k++)
-                  Wij[k] = ShimbellMul(tmpMatrix[i, k], AdjMatrix[k, j]);
-                if (isMin) 
-                {
-                  int k;
-                  for (k = 0; (k < _p) && (Wij[k] <= 0); k++) ;
-                    if (k < _p) R[i, j] = Wij[k];
-                    else R[i, j] = 0;
-                  for (k++; k < _p; k++)
-                    if ((Wij[k] < R[i, j]) && (Wij[k] > 0))
-                      R[i, j] = Wij[k];
-                }
-                else R[i, j] = Wij.Max();
-              }
-            }
-            if (n < edgesInPath) R.CopyMatrixTo(tmpMatrix, _p, _p);
-          }
-          return R;
-        }   
-        private int ShimbellMul(int a, int b)
-        {
-          return (a == 0 || b == 0) ? 0 : a + b;
-        }
-        
+выводящая результат.        
 
 ### Достижимость вершин
 
@@ -964,37 +913,6 @@ isMin и *int* edgesInPath.
 В поле класса *Graph* DijkstraIterations записывается получившееся
 количество итераций.
 
-        public int[] Dijkstra(int s)
-        {
-          if (HasNegativeWeight)
-            throw new Exception("Не реализуется на графе с \"-\" весами"); 
-            
-          if ((s < 0) || (s > VertexNum - 1))
-            throw new Exception(String.Format("Номер вершины должен быть от 0 до {0}", VertexNum - 1));
-            
-          int infinite = System.Int32.MaxValue;
-          bool[] visited = new bool[VertexNum]; // постоянна ли метка
-          int[] d = new int[VertexNum];
-          for (int i = 0; i < VertexNum; i++)
-            visited[i] = false, d[i] = infinite;
-          d[s] = 0, visited[s] = true;  
-          int countIterations = 0, v = s, min_u = 0, min_d = 0;
-          for (int p = s + 1; p < VertexNum; p++, min_u = 0, min_d = infinite) {
-            for (int u = 0; u < VertexNum; u++, countIterations++) {
-              if (AdjMatrix[v, u] != 0) 
-                if (visited[u] == false && (d[u] > (d[v] + AdjMatrix[v, u])))
-                  d[u] = d[v] + AdjMatrix[v, u];
-              if (visited[u] == false && d[u] < min_d) 
-                  min_u = u, min_d = d[u]; // выбираем вершину с наим.знач метки.
-            }
-            v = min_u;  // текущ. вершинра - вершина с мин. меткой
-            visited[min_u] = true;  // делаем метку постоянной
-          }
-          DijkstraIterations = countIterations;
-          return d;
-        }
-        
-
 ### Алгоритм Беллмана-Форда
 
 Метод BellmanFord принимает в качестве параметри номер вершины от
@@ -1011,26 +929,6 @@ isMin и *int* edgesInPath.
 
 В поле класса *Graph* BellmanFordIterations записывается получившееся
 количество итераций.
-
-        public int?[] BellmanFord(int s)
-        {
-          if ((s < 0) || (s > VertexNum - 1))
-            throw new Exception(String.Format("Номер вершины должен быть от 0 до {0}", VertexNum - 1));
-          int? infinite = null;
-          int?[] d = new int?[VertexNum];
-          for (int i = 0; i < VertexNum; i++)
-            d[i] = infinite;
-          d[s] = 0;
-          int countIterations = 0;
-          for (int i = s; i < VertexNum; i++)
-            for (int j = 0; j < VertexNum; j++, countIterations++) 
-              if (AdjMatrix[i, j] != 0)
-                if ((d[j] == infinite) || (d[j] > d[i] + AdjMatrix[i, j]))
-                  d[j] = d[i] + AdjMatrix[i, j];
-          BellmanFordIterations = countIterations;
-          return d;
-        }   
-        
 
 ### Алгоритм Флойда-Уоршелла
 
@@ -1052,31 +950,6 @@ isMin и *int* edgesInPath.
 количество итераций. В поле класса *Graph*
 FloydWarshallIterationsForOneVertex запиписывается получившееся
 количество итераций для одной вершины.
-
-        public int?[,] FloydWarshall(int s = 0)
-        {
-          if ((s < 0) || (s > VertexNum - 1))
-          throw new Exception(String.Format("Номер вершины должен быть от 0 до {0}", VertexNum - 1));
-          int? infinite = null;
-          int?[,] T = new int?[VertexNum, VertexNum];
-          for (int i = 0; i < VertexNum; i++) 
-            for (int j = 0; j < VertexNum; j++) 
-              if (AdjMatrix[i, j] == 0 && i != j) T[i, j] = infinite;
-              else T[i, j] = AdjMatrix[i, j];
-          int countIterations = 0, countIterationsS = 0;
-          for (int k = 0; k < VertexNum; k++) 
-            for (int i = 0; i < VertexNum; i++) 
-              for (int j = 0; j < VertexNum; j++, countIterations++) {
-                if (k == s) countIterationsS++;
-                if ((i != k) && (j != k) && (T[i, k] != infinite) && (T[k, j] != infinite)
-                     && ((T[i, j] == infinite) || (T[i, j] > T[i, k] + T[k, j])))
-                  T[i, j] = T[i, k] + T[k, j];
-              }
-          FloydWarshallIterations = countIterations;
-          FloydWarshallIterationsForOneVertex = countIterationsS;
-          return T;
-        }
-        
 
 Построение остовных деревьев
 ----------------------------
@@ -1101,34 +974,6 @@ FloydWarshallIterationsForOneVertex запиписывается получив�
 
 Пользовательский интерфейс состоит из кнопки **Алгоритм Прима**.
 
-        public Tuple<List<Edge>, int> Prima()
-        {
-          Disorientate();
-          List<Edge> Ostov = new List<Edge>(); // множество ребер в остове
-          List<int> S = new List<int> { 0 }, S2 = new List<int>(); 
-          int MinCost = 0, infinity = System.Int32.MaxValue, min = infinity, ne = 1;
-          int[,] C = new int[VertexNum, VertexNum]; // матрица длин ребер, infinity
-          for (int i = 0; i < VertexNum; i++)
-            for (int j = 0; j < VertexNum; j++)
-              if (AdjMatrix[i, j] != 0) C[i, j] = AdjMatrix[i, j];
-              else C[i, j] = infinity;
-          for (int i = 1; i < VertexNum; i++) S2.Add(i);
-          int countIterations = 0, u = 0, v = 0;
-          while (ne < VertexNum) {
-            min = infinity;
-            foreach (int i in S)
-              foreach (int j in S2) {
-                if (C[i, j] < min) min = C[i, j], u = i, v = j;
-                countIterations++;
-              }
-            S.Add(v);
-            S2.RemoveAt(S2.FindIndex(x => x == v));
-            Ostov.Add(new Edge(u, v, min));
-            MinCost += min, ne++, C[u, v] = C[v, u] = infinity;
-          } PrimaIterations = countIterations;
-          return Tuple.Create(Ostov, MinCost);
-        } 
-
 ### Алгоритм Краскала
 
 Метод Kruskal возвращает кортеж, состоящий из списка ребер -
@@ -1145,36 +990,6 @@ FloydWarshallIterationsForOneVertex запиписывается получив�
 
 Пользовательский интерфейс состоит из кнопки **Алгоритм Краскала**.
 
-        public Tuple<List<Edge>, int> Kruskal()
-        {
-          Disorientate();
-          List<Edge> Ostov = new List<Edge>(); // множество ребер в остове
-          List<int> S = new List<int>(); // множество вершин в остове
-          bool[] visited = new bool[VertexNum];
-          int countIterations = 0, MinCost = 0; 
-          Edges.Sort(); 
-          visited[0] = true;
-          for (int i = 0; i < VertexNum; i++)
-            foreach (Edge e in Edges) {
-              if (visited[e.v1]) {
-                if (!visited[e.v2]) {
-                  visited[e.v2] = true; Ostov.Add(e); MinCost += e.weight;
-                  break;
-                }
-              }
-              else if (visited[e.v2])
-                if (!visited[e.v1]) {
-                  visited[e.v1] = true; Ostov.Add(new Edge(e.v2, e.v1, e.weight));
-                  MinCost += e.weight;
-                  break;
-                }
-              countIterations++;
-            }
-          KruskalIterations = countIterations;
-          return Tuple.Create(Ostov, MinCost);
-        }
-        
-
 ### Матричная теорема Кирхгофа
 
 Метод Kirchhoff возвращает кортеж, состоящий из матрицы Кирхгоффа и
@@ -1189,25 +1004,7 @@ FloydWarshallIterationsForOneVertex запиписывается получив�
 Пользовательский интерфейс состоит из кнопки **Число каркасов**.
 
 Для получения минора и определителя используются описанные в
-[sec:sec:matrix] методы расширения.
-
-        public Tuple<int[,], int> Kirchhoff()
-        {
-          Disorientate();
-          int[,] Kirchhoff = new int[VertexNum, VertexNum];
-          for (int i = 0; i < VertexNum; i++)
-            for (int j = i + 1; j < VertexNum; j++)
-              if (AdjMatrix[i, j] != 0)
-              {
-                Kirchhoff[i, j] = Kirchhoff[j, i] = -1;
-                Kirchhoff[i, i]++;
-                Kirchhoff[j, j]++;
-              } 
-          int[,] Minor = Kirchhoff.GetMinor(VertexNum, VertexNum, 0, 0);
-          int d = Minor.Det(VertexNum - 1);
-          return Tuple.Create(Kirchhoff, d);
-        }
-        
+разделе *Матрицы* методы расширения.
 
 ### Код Прюфера
 
@@ -1222,68 +1019,6 @@ FloydWarshallIterationsForOneVertex запиписывается получив�
 вызове метода Kruskal.
 
 Пользовательский интерфейс состоит из кнопки **Код Прюферы**.
-
-        public Tuple<List<int>, List<Edge>> Prufer()
-        {
-          List<Edge> OstovKruskal = Kruskal().Item1;
-          List<int> Code = new List<int>();
-          int infinity = System.Int32.MaxValue;
-          int min = infinity, prev = infinity;
-          int[] Deg = new int[VertexNum];
-          foreach (Edge e in OstovKruskal)
-            Deg[e.v1]++, Deg[e.v2]++;   
-          List<int> Leaves = new List<int>();
-          for (int i = 0; i < VertexNum - 1; i++)
-          {
-            Leaves.Clear();
-            for (int j = 0; j < VertexNum; j++)
-              if (Deg[j] == 1) Leaves.Add(j);
-            min = infinity;
-            foreach (int leaf in Leaves)
-              if (leaf < min) min = leaf;
-            Deg[min]--;
-            for (int j = 0; j < VertexNum; j++)
-              if (Deg[j] != 0 && (OstovKruskal.Contains(new Edge(min, j))
-                  || OstovKruskal.Contains(new Edge(j, min))))
-              {
-                prev = j;
-                break;
-              }
-            Deg[prev]--;
-            Code.Add(prev);
-          }
-          List<int> CodePrufer = new List<int>();
-          CodePrufer.AddRange(Code);
-        
-        ////////////////////////////////////////////// Decode
-        
-          List<Edge> Ostov = new List<Edge>(); // множество ребер в остове
-          bool flag = true;
-          List<int> B = new List<int>();
-          bool[] visited = new bool[VertexNum];
-          while (Code.Count() > 0)
-          {
-            B.Clear();
-            for (int i = 0; i < VertexNum; i++)
-            {
-              flag = true;
-              for (int j = 0; j < Code.Count(); j++)
-                if (Code[j] == i)
-                {
-                  flag = false;
-                  break;
-                }
-              if (flag && !visited[i]) B.Add(i);
-            }
-            min = infinity;
-            for (int i = 0; i < B.Count(); i++)
-              if (B[i] < min) min = B[i];
-            visited[min] = true;
-            Ostov.Add(new Edge(Code[0], min, AdjMatrix[Code[0], min]));
-            Code.RemoveAt(0);
-          }
-          return Tuple.Create(CodePrufer, Ostov);
-        } 
 
 Потоки в сетях
 --------------
@@ -1304,68 +1039,6 @@ FloydWarshallIterationsForOneVertex запиписывается получив�
 кнопки **Мах поток** и кнопки **Поток min cost** - кнопка для поиска
 потока минимальной стоимости.
 
-        public int[,] FordFulkerson(int[,] MatrixC, int n)
-        {
-          List<int> N = new List<int>(); // отметка узла
-          List<int> S = new List<int>(); // признак принадлежности вершины мн-ву S
-          List<int> Ps = new List<int>(); // "Знак", то есть направление пути
-          List<int> Pn = new List<int>(); // предшествующая вершина в аугментальной цепи
-          List<int> Pd = new List<int>(); // величина возможного увеличения потока
-          int[,] F = new int[n, n]; // матрица максимальногопотока
-          for (int i = 0; i < n; i++)
-          {
-            for (int j = 0; j < n; j++)
-              F[i, j] = 0; // вначале поток нулевой
-            N.Add(0), S.Add(0), Pn.Add(0), Ps.Add(0), Pd.Add(0);
-          }
-          int x, de, a = -1;
-        M: // итерация увеличения потока
-          for (int i = 0; i < n; i++) // инициализация
-            N[i] = 0, S[i] = 0, Pn[i] = 0, Ps[i] = 0, Pd[i] = 0;
-          S[0] = 1; // так как источник в S
-          Pd[0] = n * 100; // типабесконечность
-          do
-          {
-            a = 0;
-            for (int i = 0; i < n; i++)
-            {
-              if ((S[i] != 0) && (N[i] == 0))
-              {
-                for (int j = 0; j < n; j++)
-                  if (MatrixC[i, j] != 0)
-                    if ((S[j] == 0) && (F[i, j] < MatrixC[i, j]))
-                    {
-                      S[j] = 1, Ps[j] = 0, Pn[j] = i, a = 1;
-                      if (Pd[i] < MatrixC[i, j] - F[i, j]) Pd[j] = Pd[i];
-                      else Pd[j] = MatrixC[i, j] - F[i, j];
-                    }
-                for (int j = 0; j < n; j++)
-                  if (MatrixC[j, i] != 0)
-                    if ((S[j] == 0) && (F[j, i] > 0))
-                    {
-                      S[j] = 1, Ps[j] = 1, Pn[j] = i, a = 1;
-                      if (Pd[i] < F[j, i]) Pd[j] = Pd[i];
-                      else Pd[j] = F[j, i];
-                    }
-                N[i] = 1;
-                if (S[n - 1] != 0)
-                {
-                  x = n - 1;
-                  de = Pd[n - 1];
-                  while (x != 0)
-                  {
-                    if (Ps[x] == 0) F[Pn[x], x] = F[Pn[x], x] + de;
-                    else F[x, Pn[x]] = F[x, Pn[x]] - de;
-                    x = Pn[x];
-                  }
-                  goto M;
-                }
-              }
-            }
-          } while (a != 0);
-            return F;
-        } 
-
 ### Поток минимальной стоимости
 
 Из найденного в алгортме Форда-Фалкерсона размера максимального потока
@@ -1380,57 +1053,6 @@ FloydWarshallIterationsForOneVertex запиписывается получив�
 
 Пользовательский интерейс состоит из кнопки **Поток min cost**
 
-        public static Tuple<int[,], int> FlowMinCost()
-        {
-          int n = VertexNum, di = 2 * maxFlow / 3, minCost = 10000, d = 0;
-          int[,] F = new int[VertexNum, VertexNum];
-          List<List<int>> Band2 = new List<List<int>>(), Cost2 = new List<List<int>>();
-          for (int i = 0; i < n; i++)
-          {
-            List<int> temp2 = new List<int>(), temp3 = new List<int>();
-            for (int j = 0; j < n; j++)
-            {
-              F[i, j] = 0;
-              if (j > i) temp2.Add(AdjMatrix[i, j]), temp3.Add(BandwithMatrix[i, j]);
-              else temp2.Add(0), temp3.Add(0);
-            }
-            Band2.Add(temp2), Cost2.Add(temp3);
-          }
-          while (d < di)
-          {
-            d = 0;
-            List<int> T = new List<int>(), H = new List<int>(), Y = new List<int>();
-            G.Deikstra(Cost2, T, H, n, 0, n - 1);
-            int w = n - 1;
-            Y.Add(w);
-            while (w != 0)
-              w = H[w], Y.Add(w);
-            for (int i = Y.Count() - 1; i > 0; i--)
-              F[Y[i], Y[i - 1]] = Band2[Y[i]][Y[i - 1]];
-            F = FordFulkerson(F, n);
-            for (int i = 0; i < n; i++)
-              d += F[i, n - 1];
-            for (int i = 0; i < n; i++)
-              for (int j = 0; j < n; j++)
-              {
-                Band2[i][j] -= F[i, j];
-                if (Band2[i][j] == 0) Cost2[i][j] = 0;
-              }
-            if (d > di)
-            {
-              int dd = d - di;
-              for (int i = Y.Count() - 1; i > 0; i--)
-              F[Y[i], Y[i - 1]] -= dd;
-            }
-            int cos = 0;
-            for (int i = 0; i < n; i++)
-              for (int j = 0; j < n; j++)
-                cos += F[i, j] * BandwithMatrix[i,j];
-            minCost = cos;
-          }
-          return Tuple.Create(F, minCost);
-        } 
-
 Фундаментальные циклы
 ---------------------
 
@@ -1440,24 +1062,6 @@ FloydWarshallIterationsForOneVertex запиписывается получив�
 
 На входе метод не получает ничего. Все необходимое (матрицу смежности)
 для работы алгоритма располагается внутри самого класса *Graph*
-
-        public bool IsEuler()
-        {
-          Disorientate();
-          if (VertexNum == 2)
-            return true;
-          int deg;
-          for (int i = 0; i < VertexNum; i++)
-          {
-            deg = 0;
-            for (int j = 0; j < VertexNum; j++)
-              if (AdjMatrix[i, j] != 0) deg++;
-            if (deg % 2 != 0)
-              return false;
-          }
-          return true;
-        } // End of "IsEuler" function
-        
 
 ### Построение эйлерова графа
 
@@ -1469,41 +1073,7 @@ FloydWarshallIterationsForOneVertex запиписывается получив�
 для работы алгоритма располагается внутри самого класса *Graph*
 
 Данный метод автоматически вызывается после метода IsEuler в случае,
-если граф не является эйлеровым.
-
-        public Tuple<int[,], List<Edge>, List<Edge>> CreateEulerianMatrix()
-        {
-          Disorientate();
-          List<Edge> added = new List<Edge>(), removed = new List<Edge>();
-          int[,] Euler = new int[VertexNum, VertexNum];
-          AdjMatrix.CopyMatrixTo(Euler, VertexNum, VertexNum);
-          if (VertexNum == 2)
-            return Tuple.Create(Euler, added, removed);
-          List<int> OddVertexes = new List<int>(); // вершины с нечетными степенями
-          for (int i = 0; i < VertexNum; i++) {
-            int deg = 0;
-            for (int j = 0; j < VertexNum; j++)
-              if (AdjMatrix[i, j] != 0)
-                deg++;
-            if (deg % 2 != 0)
-              OddVertexes.Add(i); // добавляем в список вершину с нечетной степенью
-          }
-          while (OddVertexes.Count() > 0) {
-            for (int i = 1; i < OddVertexes.Count(); i++)
-              if (Euler[OddVertexes[0], OddVertexes[i]] != 0) {
-                removed.Add(new Edge(OddVertexes[0], OddVertexes[i], Euler[OddVertexes[0], OddVertexes[i]]));
-                Euler[OddVertexes[0],OddVertexes[i]]=Euler[OddVertexes[i],OddVertexes[0]]=0;                       
-                OddVertexes.RemoveAt(i), OddVertexes.RemoveAt(0);
-              }
-              else {
-                Euler[OddVertexes[0], OddVertexes[i]] = 1;
-                Euler[OddVertexes[i], OddVertexes[0]] = 1;
-                added.Add(new Edge(OddVertexes[0], OddVertexes[i], 1));
-                OddVertexes.RemoveAt(i), OddVertexes.RemoveAt(0);
-          }   }
-          return Tuple.Create(Euler, added, removed);
-        } // End of "ToEuler" function
-        
+если граф не является эйлеровым.        
 
 ### Построение эйлерова цикла
 
@@ -1516,29 +1086,6 @@ EulerianMatrix, представляющая собой эйлеров вари�
 Данная матрица заполняется в результате работы предыдущего метода.
 
 На выходе список вершин - эйлеров цикл.
-
-        public List<int> FindEulerCycle(int[,] Euler)
-        {
-          if (Euler == null)
-            throw new Exception("Сначала проверьте является ли граф эйлеровым!");
-          List<int> S = new List<int> { 0 }, EulerCycle = new List<int>();
-          while (S.Count() != 0) {
-            int v = S[S.Count() - 1];
-            bool flag = true;
-            for (int i = 0; i < VertexNum; i++) 
-              if (Euler[i, v] != 0) // Если с данной вершиной есть есть смежные
-                flag = false;
-            if (flag) S.RemoveAt(S.Count() - 1), EulerCycle.Add(v);
-            else
-              for (int i = 0; i < VertexNum; i++) 
-                if (Euler[i, v] != 0) {
-                  S.Add(i);
-                  Euler[i, v] = Euler[v, i] = 0;
-                  break;
-                }
-          }
-          return EulerCycle;
-        } // End of "FindEulerCycle" function 
 
 ### Определение является ли граф гамильтоновым
 
@@ -1554,39 +1101,6 @@ EulerianMatrix, представляющая собой эйлеров вари�
 Перед началом работы алгоритма граф дезориентируется, если он был
 ориентированным.
 
-        public bool IsHamiltonian()
-        {
-          Disorientate();
-          if (VertexNum == 2)  return true;
-          List<bool> used = new List<bool>();
-          for (int i = 0; i < VertexNum; i++) used.Add(false);
-          if (!(Dfs(0, used, AdjMatrix, VertexNum, -1))) {
-            int mi = 10000, temp = 0;
-            for (int i = 0; i < VertexNum; i++, temp = 0) {
-              for (int j = 0; j < VertexNum; j++) temp += (AdjMatrix[i, j] != 0 ? 1 : 0);
-              if (temp < mi) mi = temp;
-            }
-            if (mi >= (VertexNum / 2)) return true;
-            else  return false;
-          }
-          else  return false;
-        } // End of "IsHamiltonian" function 
-
-        private bool Dfs(int x, List<bool> used, int[,] tabl, int n, int p)
-        { used[x] = true;
-          for (int i = 0; i < n; i++) {
-            if (tabl[x, i] != 0) {
-              if (!used[i]) { bool d = Dfs(i, used, tabl, n, x), used[i] = true;
-                if (!d)
-                  return false;
-              }
-              else if (i != p)
-                return false;
-            }
-          }
-          return true;
-        } 
-
 ### Построение гамильтонова графа
 
 На входе метод CreateHamiltonianMatrix не получает ничего. Все
@@ -1601,29 +1115,6 @@ EulerianMatrix, представляющая собой эйлеров вари�
 Данный метод автоматически вызывается после метода IsHamiltonian в
 случае, если граф не является гамильтоновым.
 
-        public Tuple<int[,], List<Edge>> CreateHamiltonianMatrix()
-        {
-          Disorientate();
-          List<Edge> added = new List<Edge>();
-          int[,] Hamiltonian = new int[VertexNum, VertexNum];
-          AdjMatrix.CopyMatrixTo(Hamiltonian, VertexNum, VertexNum);    
-          for (int i = VertexNum - 1; i > -1; i--) {
-            int delta = 0;
-            while (delta < (VertexNum / 2)) {
-              for (int j = 0; j < VertexNum; j++)
-                delta += (Hamiltonian[i, j] != 0 ? 1 : 0);
-              for (int j = VertexNum - 1; j > -1; j--) 
-                if (i != j) 
-                  if (Hamiltonian[i, j] == 0) {
-                    Hamiltonian[i, j] = Hamiltonian[j, i] = 1;
-                    added.Add(new Edge(i, j, 1));
-                    break;
-                  }
-            }
-          } 
-          return Tuple.Create(Hamiltonian, added);
-        } // End of "ToHamiltonian" function 
-
 ### Задача коммивояжёра
 
 На входе метод KommivoyagerTask не получает ничего. Все необходимое
@@ -1635,75 +1126,6 @@ EulerianMatrix, представляющая собой эйлеров вари�
 
 Внутри используется вспомогательный метод GenerateTranspositions,
 генерирующий все перестановки n элементов.
-
-        public List<int> KommivoyagerTask( )
-        {
-          if (HamiltonianMatrix == null)
-            throw new Exception("Сначала проверьте является лиграф гамильтоновым!");
-          string pathLog = @"E:\Polytech\TGraph\Теория графов CSharp\Graph_V2\RESULTS\result.txt";
-          int mi = 10000, countHamiltonCycles = 0;
-          List<int[]> transpositions = GenerateTranspositions(VertexNum);
-          int[] amin = null;
-          using (System.IO.StreamWriter file = 
-                 new System.IO.StreamWriter(pathLog, false)) {
-            foreach (int[] a in transpositions) 
-              if (CheckHamiltonCycle(HamiltonianMatrix, a.ToList(), VertexNum)) {
-                countHamiltonCycles++;
-                int temp = 0;   // Считаем вес цикла
-                for (int i = 0; i < a.Count() - 1; i++)
-                  temp += HamiltonianMatrix[a[i], a[i + 1]];
-                temp += HamiltonianMatrix[a[a.Count() - 1], a[0]];
-                if (temp < mi) mi = temp, amin = a;
-                StringBuilder sb = new StringBuilder();
-                string str = string.Empty;
-                for (int z = 0; z < a.Count(); z++)
-                  str = String.Format("  {0,2}", a[z]), sb.Append(str);
-                str = String.Format("  Стоимость: {0}", temp), sb.Append(str);
-                file.WriteLine(sb.ToString());
-              }
-          }
-          return amin.ToList();
-        } 
-
-        public List<int[]> GenerateTranspositions(int n)
-        {
-          int[] array = new int[n];
-          for (int i = 0; i < n; i++) array[i] = i;
-          List<int[]> transpositions = new List<int[]>();
-          GenerateTranspositionsHelper(array, 0, transpositions);
-          return transpositions;
-        }
-        
-        private void GenerateTranspositionsHelper(int[] array, int lf, 
-                                                  List<int[]> transpositions)
-        {
-          if (lf >= array.Count()) { // перестановки окончены
-            int[] b = new int[array.Count()];
-            array.CopyTo(b, 0);
-            transpositions.Add(b);
-            return;
-          }
-          GenerateTranspositionsHelper(array, lf + 1, transpositions);  
-          for (int i = lf + 1; i < array.Count(); i++) {
-            int tmp = array[i];
-            array[i] = array[lf], array[lf] = tmp;
-            GenerateTranspositionsHelper(array, lf + 1, transpositions); 
-            tmp = array[i]; // возвращаем элемент ar[i] назад
-            array[i] = array[lf], array[lf] = tmp;
-          }
-        } 
-
-        private bool CheckHamiltonCycle(int[,] Hamiltonian, List<int> a, int n)
-        {
-          for (int i = 0; i < a.Count() - 1; i++)
-            if (Hamiltonian[a[i], a[i + 1]] == 0)
-              return false;
-          if (Hamiltonian[a[a.Count() - 1], a[0]] == 0)
-            return false;
-          return true;
-        }
-        
-        
 
 Заключение
 ==========
