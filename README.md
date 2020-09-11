@@ -236,33 +236,32 @@ c = p/(1-p) и снова генерируем случайное число о�
 
 **Пример:** Определение веса максимальных путей длиной 2
 $$
-        \Omega = \left(\begin{array}{cccc}
+\Omega = \left(\begin{array}{cccc}
             0 & 1 & 0 & 2\\
             2 & 0 & 2 & 0\\
             3 & 0 & 0 & 0\\
             0 & 2 & 1 & 0
-        \end{array} \right)
-    
-        \Omega^2 = \left(\begin{array}{cccc}
+\end{array} \right)
+$$
+$$
+\Omega^2 = \left(\begin{array}{cccc}
             0 & 1 & 0 & 2\\
             2 & 0 & 2 & 0\\
             3 & 0 & 0 & 0\\
             0 & 2 & 1 & 0
-        \end{array} \right) 
-        \left(\begin{array}{cccc}
+\end{array} \right) 
+\left(\begin{array}{cccc}
             0 & 1 & 0 & 2\\
             2 & 0 & 2 & 0\\
             3 & 0 & 0 & 0\\
             0 & 2 & 1 & 0
-        \end{array} \right) 
-        = 
-        \left(\begin{array}{cccc}
+\end{array} \right) = 
+\left(\begin{array}{cccc}
             3 & 4 & 3 & 0\\
             0 & 2 & 5 & 4\\
             0 & 0 & 0 & 0\\
             4 & 0 & 4 & 0
-        \end{array} \right) 
-     , где\
+\end{array} \right), где
 $$
 \omega_{1,1} = 0 \cdot 0 + 1 \cdot 2 + 0 \cdot 3 + 2 \cdot 0 \to \text{max}\{0 + 0, 1 + 2, 0 + 3, 2 + 0\} = 3$\
 \omega_{1,2} = \text{max}\{0 + 1, 1 + 0, 0 + 0, 2 + 2\} = 4$\
